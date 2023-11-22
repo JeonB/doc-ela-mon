@@ -1,0 +1,162 @@
+version: '3.9'
+
+services:
+  # mongodb:
+  #   image: mongo
+  #   container_name: mongodb
+  #   command: ["--replSet", "${MONGO_REPLSET_NAME}", "--port", "${MONGO_PORT}", "--keyFile", "/data/key.file"]
+  #   restart: always
+  #   healthcheck:
+  #     test: |
+  #       test $$(sh /data/init-replicaSet.sh) -eq 1
+  #     interval: 10s
+  #     start_period: 20s
+  #   expose:
+  #     - 27017
+  #   ports:
+  #     - 27017:${MONGO_PORT}
+  #   volumes:
+  #     - ./mongo/initdb.d/:/docker-entrypoint-initdb.d/
+  #     - ./mongo/init-replicaSet.sh:/data/init-replicaSet.sh:ro
+  #     - ./mongo/key.file:/data/key.file:ro
+  #     - mongodbdata:/data/db
+  #   env_file: .env
+  #   networks:
+  #     - db
+  mongo1:
+    env_file: .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
+    image: mongo:latest
+    hostname: mongo1
+    container_name: mongo1
+    restart: always
+    expose:
+      - "27017"
+    ports:
+      - 27018:27017
+    volumes:
+      - ./mongo/data:/data/db
+      - ./mongo/key.file:/data/key.file:ro
+    command: 'mongod --replSet myReplicaSet --keyFile /data/key.file --bind_ip_all'
+    networks:
+      - db
+  mongo2:
+    env_file: .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
+    image: mongo:latest
+    hostname: mongo2
+    container_name: mongo2
+    restart: always
+    depends_on:
+      - mongo1
+    expose:
+      - "27017"  
+    ports:
+      - 27019:27017
+    volumes:
+      - ./mongo/data2:/data/db
+      - ./mongo/key.file:/data/key.file:ro
+    command: 'mongod --replSet myReplicaSet --keyFile /data/key.file --bind_ip_all'
+    networks:
+      - db
+  mongo3:
+    env_file: .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
+    image: mongo:latest
+    hostname: mongo3
+    container_name: mongo3
+    restart: always
+    depends_on:
+      - mongo2
+    expose:
+      - "27017"  
+    ports:
+      - 27020:27017
+    volumes:
+      - ./mongo/data3:/data/db
+      - ./mongo/key.file:/data/key.file:ro
+    command: 'mongod --replSet myReplicaSet --keyFile /data/key.file --bind_ip_all'
+    networks:
+      - db
+
+  elasticsearch:
+    env_file: .env
+    container_name: elasticsearch
+    build:
+      context: elasticsearch/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    ports:
+      - 9200:9200
+      - 9300:9300
+    volumes:
+      - type: bind
+        source: ./elasticsearch/config/elasticsearch.yml
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+        read_only: true
+      - type: volume
+        source: elasticsearchdata
+        target: /usr/share/elasticsearch/data
+    networks:
+      - elk
+  
+  kibana:
+    env_file: .env
+    environment:
+      - ELASTICSEARCH_HOSTS=http://${ELASTIC_USER}:${ELASTIC_PASSWORD}@elasticsearch:9200
+    image: kibana:8.11.1
+    container_name: kibana
+    build:
+      context: kibana/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    ports:
+      - 5601:5601
+    volumes:
+      - type: bind
+        source: ./kibana/config/kibana.yml
+        target: /usr/share/kibana/config/kibana.yml
+        read_only: true
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
+  monstache:
+    env_file: .env
+    # environment:
+    #   - MONSTACHE_ES_USER="kibana_sysmtem"
+    #   - MONSTACHE_ES_PASS=${ELASTIC_PASSWORD}
+      # - MONSTACHE_MONGO_URL=mongodb://mongodb.obp:${MONGO_PORT}
+    image: rwynn/monstache:latest
+    container_name: monstache
+    command: -f ./monstache.config.toml &
+    #command: tail -F anything
+    volumes:          
+      - ./monstache/monstache.config.toml:/monstache.config.toml
+      - monstachedata:/monstache/
+    networks:
+      - db
+      - elk
+    depends_on:
+      - elasticsearch
+      - mongo1
+      - mongo2
+      - mongo3
+
+networks:
+  db:
+    driver: bridge
+  elk:
+    driver: bridge
+
+volumes:
+  mongodbdata:
+  elasticsearchdata:
+  monstachedata:
