@@ -10,14 +10,14 @@ elasticsearch-urls = ["http://elasticsearch:9200"]
 
 # if you need to seed an index from a collection and not just listen and sync changes events
 # you can copy entire collections or views from MongoDB to Elasticsearch
-direct-read-namespaces = ["testdb.test.test"]
+direct-read-namespaces = ["test.mycollection"]
 
 # if you want to use MongoDB change streams instead of legacy oplog tailing use change-stream-namespaces
 # change streams require at least MongoDB API 3.6+
 # if you have MongoDB 4+ you can listen for changes to an entire database or entire deployment
 # in this case you usually don't need regexes in your config to filter collections unless you target the deployment.
 # to listen to an entire db use only the database name.  For a deployment use an empty string.
-#change-stream-namespaces = ["test"]
+change-stream-namespaces = ["test.mycollection"]
 # additional settings
 
 # if you don't want to listen for changes to all collections in MongoDB but only a few

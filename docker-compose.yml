@@ -25,9 +25,9 @@ services:
   #     - db
   mongo1:
     env_file: .env
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME
-      - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
+    # environment:
+    #   - MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME
+    #   - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
     image: mongo:latest
     hostname: mongo1
     container_name: mongo1
@@ -44,9 +44,9 @@ services:
       - db
   mongo2:
     env_file: .env
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME
-      - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
+    # environment:
+    #   - MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME
+    #   - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
     image: mongo:latest
     hostname: mongo2
     container_name: mongo2
@@ -65,9 +65,9 @@ services:
       - db
   mongo3:
     env_file: .env
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME
-      - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
+    # environment:
+    #   - MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME
+    #   - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
     image: mongo:latest
     hostname: mongo3
     container_name: mongo3
