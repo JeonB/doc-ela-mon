@@ -6,11 +6,11 @@ services:
   #   container_name: mongodb
   #   command: ["--replSet", "${MONGO_REPLSET_NAME}", "--port", "${MONGO_PORT}", "--keyFile", "/data/key.file"]
   #   restart: always
-  #   healthcheck:
-  #     test: |
-  #       test $$(sh /data/init-replicaSet.sh) -eq 1
-  #     interval: 10s
-  #     start_period: 20s
+    # healthcheck:
+    #   test: |
+    #     test $$(sh /data/init-replicaSet.sh) -eq 1
+    #   interval: 10s
+    #   start_period: 20s
   #   expose:
   #     - 27017
   #   ports:
@@ -31,59 +31,65 @@ services:
     image: mongo:latest
     hostname: mongo1
     container_name: mongo1
+    command: ["--replSet", "${MONGO_REPLSET_NAME}", "--port", "${MONGO_PORT}"]
     restart: always
-    expose:
-      - "27017"
+    healthcheck:
+      test: |
+        test $$(sh /data/init-replicaSet.sh) -eq 1
+      interval: 10s
+      start_period: 20s
+    # expose:
+    #   - "27017"
     ports:
-      - 27018:27017
+      - 27017:${MONGO_PORT}
     volumes:
-      - ./mongo/data:/data/db
-      - ./mongo/key.file:/data/key.file:ro
-    command: 'mongod --replSet myReplicaSet --keyFile /data/key.file --bind_ip_all'
+      - ./mongo/init-replicaSet.sh:/data/init-replicaSet.sh
+      - mongodbdata:/data/db
+      # - ./mongo/key.file:/data/key.file:ro
     networks:
       - db
-  mongo2:
-    env_file: .env
-    # environment:
-    #   - MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME
-    #   - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
-    image: mongo:latest
-    hostname: mongo2
-    container_name: mongo2
-    restart: always
-    depends_on:
-      - mongo1
-    expose:
-      - "27017"  
-    ports:
-      - 27019:27017
-    volumes:
-      - ./mongo/data2:/data/db
-      - ./mongo/key.file:/data/key.file:ro
-    command: 'mongod --replSet myReplicaSet --keyFile /data/key.file --bind_ip_all'
-    networks:
-      - db
-  mongo3:
-    env_file: .env
-    # environment:
-    #   - MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME
-    #   - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
-    image: mongo:latest
-    hostname: mongo3
-    container_name: mongo3
-    restart: always
-    depends_on:
-      - mongo2
-    expose:
-      - "27017"  
-    ports:
-      - 27020:27017
-    volumes:
-      - ./mongo/data3:/data/db
-      - ./mongo/key.file:/data/key.file:ro
-    command: 'mongod --replSet myReplicaSet --keyFile /data/key.file --bind_ip_all'
-    networks:
-      - db
+  # mongo2:
+  #   env_file: .env
+  #   # environment:
+  #   #   - MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME
+  #   #   - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
+  #   image: mongo:latest
+  #   hostname: mongo2
+  #   container_name: mongo2
+  #   restart: always
+  #   depends_on:
+  #     - mongo1
+  #   expose:
+  #     - "27017"  
+  #   ports:
+  #     - 27019:27017
+  #   volumes:
+  #     - ./mongo/data2:/data/db
+  #     - ./mongo/key.file:/data/key.file:ro
+  #   command: 'mongod --replSet myReplicaSet --keyFile /data/key.file --bind_ip_all'
+  #   networks:
+  #     - db
+  # mongo3:
+  #   env_file: .env
+  #   # environment:
+  #   #   - MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME
+  #   #   - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
+  #   image: mongo:latest
+  #   hostname: mongo3
+  #   container_name: mongo3
+  #   restart: always
+  #   depends_on:
+  #     - mongo2
+  #   expose:
+  #     - "27017"  
+  #   ports:
+  #     - 27020:27017
+  #   volumes:
+  #     - ./mongo/data3:/data/db
+  #     - ./mongo/key.file:/data/key.file:ro
+  #   command: 'mongod --replSet myReplicaSet --keyFile /data/key.file --bind_ip_all'
+  #   networks:
+  #     - db
 
   elasticsearch:
     env_file: .env
@@ -109,7 +115,7 @@ services:
   kibana:
     env_file: .env
     environment:
-      - ELASTICSEARCH_HOSTS=http://${ELASTIC_USER}:${ELASTIC_PASSWORD}@elasticsearch:9200
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     image: kibana:8.11.1
     container_name: kibana
     build:
@@ -147,8 +153,7 @@ services:
     depends_on:
       - elasticsearch
       - mongo1
-      - mongo2
-      - mongo3
+      
 
 networks:
   db:

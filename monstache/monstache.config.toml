@@ -1,7 +1,7 @@
 # connection settings
 
 # connect to MongoDB using the following URL
-mongo-url = "mongodb://admin:abc123@mongo1:27017,mongo2:27017,mongo3:27017/servicename?replicaSet=myReplicaSet&authSource=admin"
+mongo-url = "mongodb://mongo1:27017/servicename?replicaSet=myReplicaSet"
 
 # connect to the Elasticsearch REST API at the following node URLs
 elasticsearch-urls = ["http://elasticsearch:9200"]

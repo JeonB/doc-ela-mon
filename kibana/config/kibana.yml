@@ -1,6 +1,6 @@
 server.name: kibana
 server.host: "0.0.0.0"
 elasticsearch.hosts: [ "http://elasticsearch:9200" ]
-elasticsearch.username: "kibana_sysmtem"
-elasticsearch.password: "sojeon123"
-xpack.monitoring.ui.container.elasticsearch.enabled: true
+# elasticsearch.username: "kibana_sysmtem"
+# elasticsearch.password: "sojeon123"
+xpack.monitoring.ui.container.elasticsearch.enabled: false
