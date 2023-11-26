@@ -136,6 +136,7 @@ services:
 
   monstache:
     env_file: .env
+    restart: always
     # environment:
     #   - MONSTACHE_ES_USER="kibana_sysmtem"
     #   - MONSTACHE_ES_PASS=${ELASTIC_PASSWORD}
