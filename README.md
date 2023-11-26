@@ -71,14 +71,15 @@ $ docker exec -it mongo1 mongosh
 ```
 4. 컨테이너 재시작
 -----------------
-```
+
 유의사항
 mongodb://mongo1:27017,mongo2:27017,mongo3:27017/servicename?replicaSet=myReplicaSet
 mongo-compass를 통해 위 url로 접속하여 직접 데이터 삽입 및 수정이 가능하지만, etc/hosts에서
+아래와와 같이 호스트 네임을 추가해야 합니다.
+```
 127.0.0.1 mongo1
 127.0.0.1 mongo2
 127.0.0.1 mongo3
-위와 같이 호스트 네임을 추가해야 합니다.
 ```
 
 ### ElasticSearch
