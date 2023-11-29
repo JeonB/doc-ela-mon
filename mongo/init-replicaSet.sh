@@ -1,4 +1,3 @@
-set -e
 
 mongosh --quiet --norc "mongodb://${MONGO_HOSTNAME}:${MONGO_PORT}" --eval <<EOF
     try {
